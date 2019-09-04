@@ -1,6 +1,5 @@
 package kings.image;
 
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
@@ -51,15 +50,22 @@ public class ImageProcessor {
 
 		for (int row = 0; row < height; row += 1) {
 			for (int col = 0; col < width; col += 1) {
-				Color c = new Color(image.getRGB(col, row));
-				int red = c.getRed();
-				int green = c.getGreen();
-				int blue = c.getBlue();
-
-				int gray = (int) (0.299 * red + 0.587 * green + 0.114 * blue);
-
-				Color newColor = new Color(gray, gray, gray);
-				resultData[row * width + col] = newColor.getRGB();
+			    int index = row * width + col; 
+			    int pixel = inputData[index]; 
+			   
+			    Pixel pixelData = new Pixel(pixel);
+			    
+			    int red = pixelData.getRed();
+			    int green = pixelData.getGreen();
+			    int blue = pixelData.getBlue();
+			    
+			    int gray = (int) (red * 0.299 + green * 0.587 + blue * 0.114);
+			    
+			    pixelData.setRed(gray);
+			    pixelData.setGreen(gray);
+			    pixelData.setBlue(gray);
+			    
+			    resultData[index] = pixelData.getData(); 
 			}
 		}
 

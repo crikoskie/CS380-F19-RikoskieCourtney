@@ -161,15 +161,19 @@ public class ImageGUI extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (event.getSource() == saveItem) {
-			JFileChooser chooser = new JFileChooser();
-			chooser.showSaveDialog(null);
+			if (outputImage != null) {
+				JFileChooser chooser = new JFileChooser();
+				chooser.showSaveDialog(null);
 
-			File saveFile = chooser.getSelectedFile();
+				File saveFile = chooser.getSelectedFile();
 
-			try {
-				ImageIO.write(outputImage, "png", saveFile);
-			} catch (IOException e) {
-				JOptionPane.showMessageDialog(this, "Could not save image.", "Error", JOptionPane.ERROR_MESSAGE);
+				try {
+					ImageIO.write(outputImage, "png", saveFile);
+				} catch (IOException e) {
+					JOptionPane.showMessageDialog(this, "Could not save image.", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			} else {
+				JOptionPane.showMessageDialog(this, "No image to save.", "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		} else if (event.getSource() == exitItem) {
 			System.exit(0);
@@ -190,7 +194,7 @@ public class ImageGUI extends JFrame implements ActionListener {
 
 			input.repaint();
 			output.repaint();
-			
+
 			inputImage = null;
 			outputImage = null;
 		} else if (event.getSource() == openItem) {

@@ -32,7 +32,7 @@ public class TimeWriter {
 		}
 		
 		FileWriter fw = new FileWriter("README.md", false);
-		fw.write("Time spent on " + algorithm + ": " + Math.round(timeSpent) + " ms\n");
+		fw.write("Time spent on " + algorithm + " algorithm: " + Math.round(timeSpent) + " ms\n");
 		
 		for (int line = 1; line < list.size(); line += 1) {
 			fw.write(list.get(line) + "\n");
