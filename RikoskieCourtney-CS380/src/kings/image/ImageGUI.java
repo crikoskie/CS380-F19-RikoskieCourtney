@@ -32,10 +32,11 @@ public class ImageGUI extends JFrame implements ActionListener {
 	/** Generated unique serial ID. */
 	private static final long serialVersionUID = -83467130412987566L;
 
-	/** The image processor. */
+	/** The serial image processor. */
 	private ImageProcessor processor;
 
-	private ParallelSetUp parallel;
+	/** The parallel image processor. */
+	private ParallelImageProcessor parallel;
 
 	/** The save menu item. */
 	private JMenuItem saveItem;
@@ -71,7 +72,7 @@ public class ImageGUI extends JFrame implements ActionListener {
 	 */
 	public ImageGUI() {
 		processor = new ImageProcessor();
-		parallel = new ParallelSetUp();
+		parallel = new ParallelImageProcessor();
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(new FlowLayout());

@@ -23,7 +23,7 @@ public class TimeWriter {
 	 * @throws IOException
 	 *             Thrown when the ReadMe file cannot be written to.
 	 */
-	public void writeToReadMe(String algorithm, long timeSpent) throws IOException {
+	public static void writeToReadMe(String algorithm, long timeSpent) throws IOException {
 		Scanner read = new Scanner(new File("README.md"));
 		ArrayList<String> list = new ArrayList<String>();
 		
@@ -32,7 +32,7 @@ public class TimeWriter {
 		}
 		
 		FileWriter fw = new FileWriter("README.md", false);
-		fw.write("Time spent on " + algorithm + " algorithm: " + Math.round(timeSpent) + " ms\n");
+		fw.write("Time spent on " + algorithm.toLowerCase() + " algorithm: " + Math.round(timeSpent) + " ms\n");
 		
 		for (int line = 1; line < list.size(); line += 1) {
 			fw.write(list.get(line) + "\n");
