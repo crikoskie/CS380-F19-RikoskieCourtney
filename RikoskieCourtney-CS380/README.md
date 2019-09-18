@@ -1,4 +1,4 @@
-The amount of milliseconds needed to complete the last used image processing algorithm will appear here.
+Time spent on sepia algorithm: 18 ms
 
 ****************** DO NOT WRITE ABOVE THIS LINE ******************
 

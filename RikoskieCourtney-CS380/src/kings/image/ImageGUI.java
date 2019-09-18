@@ -12,6 +12,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -34,6 +35,8 @@ public class ImageGUI extends JFrame implements ActionListener {
 	/** The image processor. */
 	private ImageProcessor processor;
 
+	private ParallelSetUp parallel;
+
 	/** The save menu item. */
 	private JMenuItem saveItem;
 	/** The exit menu item. */
@@ -42,8 +45,6 @@ public class ImageGUI extends JFrame implements ActionListener {
 	private JMenuItem openItem;
 	/** The clear menu item. */
 	private JMenuItem clearItem;
-	/** The button to grayscale image. */
-	private JButton gray;
 	/** The image input panel. */
 	private JPanel input;
 	/** The image output panel. */
@@ -58,12 +59,19 @@ public class ImageGUI extends JFrame implements ActionListener {
 	private JPanel imagesPanel;
 	/** The panel containing the buttons. */
 	private JPanel buttonPanel;
+	/** The combo box containing all the devices. */
+	private JComboBox<String> deviceList;
+	/** The combo box containing all the algorithms. */
+	private JComboBox<String> algorithmList;
+	/** The button to do the selected algorithm. */
+	private JButton go;
 
 	/**
 	 * Creates the image processor GUI.
 	 */
 	public ImageGUI() {
 		processor = new ImageProcessor();
+		parallel = new ParallelSetUp();
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(new FlowLayout());
@@ -115,10 +123,24 @@ public class ImageGUI extends JFrame implements ActionListener {
 
 		buttonPanel = new JPanel();
 
-		gray = new JButton("Grayscale");
-		gray.addActionListener(this);
+		go = new JButton("Go");
+		buttonPanel.add(go);
+		go.addActionListener(this);
 
-		buttonPanel.add(gray);
+		String[] algorithms = { "Grayscale" , "Sepia" };
+		algorithmList = new JComboBox<String>(algorithms);
+		algorithmList.setSelectedIndex(0);
+		algorithmList.addActionListener(this);
+
+		buttonPanel.add(algorithmList);
+
+		String[] devices = parallel.getDeviceNames();
+
+		deviceList = new JComboBox<String>(devices);
+		deviceList.setSelectedIndex(parallel.getGPUIndex());
+		deviceList.addActionListener(this);
+
+		buttonPanel.add(deviceList);
 
 		imagesPanel = new JPanel();
 
@@ -218,7 +240,7 @@ public class ImageGUI extends JFrame implements ActionListener {
 					input.setPreferredSize(new Dimension(width + 50, height + 50));
 					output.setPreferredSize(new Dimension(width + 50, height + 50));
 					imagesPanel.setPreferredSize(new Dimension(width * 2 + 50, height + 50));
-					mainPanel.setPreferredSize(new Dimension(width * 2 + 50, height + gray.getHeight() + 75));
+					mainPanel.setPreferredSize(new Dimension(width * 2 + 50, height + 75));
 					pack();
 
 					g.drawImage(bi, 0, 0, null);
@@ -241,10 +263,43 @@ public class ImageGUI extends JFrame implements ActionListener {
 			} catch (IllegalArgumentException e) {
 				// do nothing
 			}
-		} else if (event.getSource() == gray) {
+		} else if (event.getSource() == go) {
 			if (inputImage != null) {
 				try {
-					outputImage = processor.grayscale(inputImage);
+					String algorithm = (String) algorithmList.getSelectedItem();
+					int device = deviceList.getSelectedIndex();
+
+					if (algorithm.equals("Grayscale")) {
+						if (device != parallel.getGPUIndex()) {
+							outputImage = processor.grayscale(inputImage);
+						} else {
+							parallel.setDeviceID(device);
+
+							parallel.runAlgorithm("Grayscale", processor.getPixelData(inputImage));
+
+							if (outputImage == null) {
+								outputImage = new BufferedImage(inputImage.getWidth(), inputImage.getHeight(),
+										BufferedImage.TYPE_INT_ARGB);
+							}
+
+							processor.convertPixelDataToImage(parallel.getResult(), inputImage, outputImage);
+						}
+					} else if (algorithm.equals("Sepia")) {
+						if (device != parallel.getGPUIndex()) {
+							outputImage = processor.sepia(inputImage);
+						} else {
+							parallel.setDeviceID(device);
+
+							parallel.runAlgorithm("Sepia", processor.getPixelData(inputImage));
+
+							if (outputImage == null) {
+								outputImage = new BufferedImage(inputImage.getWidth(), inputImage.getHeight(),
+										BufferedImage.TYPE_INT_ARGB);
+							}
+
+							processor.convertPixelDataToImage(parallel.getResult(), inputImage, outputImage);
+						}
+					}
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(this, "Could not write time spent to ReadMe file.", "Error",
 							JOptionPane.ERROR_MESSAGE);
